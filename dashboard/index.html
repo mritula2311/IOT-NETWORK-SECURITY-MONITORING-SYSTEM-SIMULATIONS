@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Network Security Monitor — Dashboard</title>
+    <meta name="description" content="Real-time IoT network security monitoring dashboard with device-aware threat detection">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-grid"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>IoT Security Monitor</h1>
+                    <p class="subtitle">Device-Aware Network Threat Detection</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge" id="statusBadge">
+                <span class="status-dot"></span>
+                <span id="statusText">Loading...</span>
+            </div>
+            <div class="header-time" id="headerTime"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Stats Row -->
+        <section class="stats-row" id="statsRow">
+            <div class="stat-card" data-type="devices">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <path d="M8 21h8M12 17v4"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalDevices">-</span>
+                    <span class="stat-label">Registered Devices</span>
+                </div>
+            </div>
+            <div class="stat-card" data-type="events">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalEvents">-</span>
+                    <span class="stat-label">Events Processed</span>
+                </div>
+            </div>
+            <div class="stat-card" data-type="alerts">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalAlerts">-</span>
+                    <span class="stat-label">Alerts Triggered</span>
+                </div>
+            </div>
+            <div class="stat-card" data-type="quarantine">
+                <div class="stat-icon" style="color: var(--accent-red);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalQuarantined">0</span>
+                    <span class="stat-label">IPS Quarantined</span>
+                </div>
+            </div>
+            <div class="stat-card" data-type="tests">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="testsPassed">-</span>
+                    <span class="stat-label">Tests Passed</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Simulation & Playback -->
+        <section class="card" id="simulatorCard">
+            <div class="card-header">
+                <h2>Interactive Scenario Traffic Replay</h2>
+                <span class="card-badge">Live Packet Simulation</span>
+            </div>
+            <div class="card-body">
+                <div class="sim-controls">
+                    <select id="scenarioSelect" class="sim-select">
+                        <option value="mixed_attack">mixed_attack (Unknown + Burst + Scan)</option>
+                        <option value="unauthorized_service">unauthorized_service (Telnet/SSH Exploit)</option>
+                        <option value="camera_burst">camera_burst (High Video Traffic)</option>
+                        <option value="normal">normal (Standard Sensor Telemetry)</option>
+                    </select>
+                    <button id="simPlayBtn" class="sim-btn sim-btn-primary">▶ Play Replay</button>
+                    <button id="simResetBtn" class="sim-btn sim-btn-secondary">↺ Reset</button>
+                    <div class="sim-progress-container">
+                        <input type="range" id="simSlider" class="sim-slider" min="0" max="100" value="0">
+                        <span id="simStats" class="sim-stats">0.0s | Pkt 0/0</span>
+                    </div>
+                </div>
+                <div class="packet-ticker" id="packetTicker">
+                    <div class="ticker-item" style="color:var(--text-muted);">Select a scenario and click Play to observe packets in real time...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Network Map & Alerts -->
+        <section class="grid-2col">
+            <!-- Network Topology -->
+            <div class="card" id="networkCard">
+                <div class="card-header">
+                    <h2>Network Topology & Device Status</h2>
+                    <span class="card-badge">192.168.50.0/24 Subnet</span>
+                </div>
+                <div class="card-body">
+                    <div class="network-map" id="networkMap">
+                        <!-- Devices rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Alert Feed -->
+            <div class="card" id="alertCard">
+                <div class="card-header">
+                    <h2>Alert Feed & Explainable Detail</h2>
+                    <div class="filter-pills" id="alertFilters">
+                        <button class="pill active" data-filter="all">All</button>
+                        <button class="pill" data-filter="UNKNOWN_IP">Unknown IP</button>
+                        <button class="pill" data-filter="UNAUTHORIZED_SERVICE">Unauthorized Port</button>
+                        <button class="pill" data-filter="TRAFFIC_BURST">Burst</button>
+                        <button class="pill" data-filter="PORT_SCAN_PATTERN">Port Scan</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert-feed" id="alertFeed">
+                        <!-- Alerts rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Active Defense & Quarantine Matrix -->
+        <section class="card" id="quarantineCard">
+            <div class="card-header">
+                <h2>Active Defense & Automated IPS Quarantine Matrix</h2>
+                <span class="card-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">Automated Mitigation</span>
+            </div>
+            <div class="card-body">
+                <div class="test-table-wrapper">
+                    <table class="quarantine-table" id="quarantineTable">
+                        <thead>
+                            <tr>
+                                <th>Target Device</th>
+                                <th>IP Address</th>
+                                <th>Threat Score</th>
+                                <th>Trigger Anomaly</th>
+                                <th>Action Taken</th>
+                                <th>Generated Firewall Rule (IPS)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quarantineTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evaluation Comparison -->
+        <section class="card" id="evalCard">
+            <div class="card-header">
+                <h2>Baseline vs Proposed Evaluation</h2>
+                <span class="card-badge">Per-Device Thresholds</span>
+            </div>
+            <div class="card-body">
+                <div class="eval-grid" id="evalGrid">
+                    <!-- Evaluation cards rendered by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Test Results -->
+        <section class="card" id="testCard">
+            <div class="card-header">
+                <h2>Security Test Results</h2>
+                <div class="test-summary" id="testSummaryBadge"></div>
+            </div>
+            <div class="card-body">
+                <div class="test-table-wrapper">
+                    <table class="test-table" id="testTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Test Case</th>
+                                <th>Condition</th>
+                                <th>Expected</th>
+                                <th>Actual</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testTableBody">
+                            <!-- Rows rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Device Registry -->
+        <section class="card" id="devicesCard">
+            <div class="card-header">
+                <h2>Device Registry</h2>
+                <span class="card-badge" id="deviceCount">-</span>
+            </div>
+            <div class="card-body">
+                <div class="device-grid" id="deviceGrid">
+                    <!-- Device cards rendered by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>IoT Network Security Monitor — Educational Mini Project</p>
+        <p class="footer-meta" id="footerMeta"></p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

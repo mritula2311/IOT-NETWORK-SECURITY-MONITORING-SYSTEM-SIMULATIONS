@@ -1,0 +1,42 @@
+{
+    "subnet": "192.168.50.0/24",
+    "window_seconds": 5.0,
+    "port_threshold": 6,
+    "cooldown_seconds": 10.0,
+    "default_threshold": 30,
+    "quarantine_threat_threshold": 60,
+    "devices": [
+        {
+            "ip": "192.168.50.1",
+            "name": "Gateway-01",
+            "role": "gateway",
+            "threshold": 50,
+            "allowed_ports": [53, 80, 443, 8883, 8000, 8080],
+            "description": "Main network gateway — higher threshold for routing traffic"
+        },
+        {
+            "ip": "192.168.50.10",
+            "name": "TempSensor-01",
+            "role": "sensor",
+            "threshold": 10,
+            "allowed_ports": [1883, 8883],
+            "description": "Temperature sensor — sends readings over MQTT / MQTTS"
+        },
+        {
+            "ip": "192.168.50.11",
+            "name": "Camera-01",
+            "role": "camera",
+            "threshold": 40,
+            "allowed_ports": [80, 443, 554, 8883, 8080],
+            "description": "Security camera — higher rate for video stream bursts and management"
+        },
+        {
+            "ip": "192.168.50.20",
+            "name": "AppServer-01",
+            "role": "server",
+            "threshold": 60,
+            "allowed_ports": [80, 443, 1883, 8883, 8000, 8080],
+            "description": "IoT application server — receives from many devices"
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+[
+    {"event_id": "U01", "elapsed_s": 0.0, "src": "192.168.50.10", "dst": "192.168.50.20", "protocol": "TCP", "dport": 8883, "initial_syn": false, "label": "normal"},
+    {"event_id": "U02", "elapsed_s": 2.0, "src": "192.168.50.10", "dst": "192.168.50.20", "protocol": "TCP", "dport": 8883, "initial_syn": false, "label": "normal"},
+    {"event_id": "U03", "elapsed_s": 4.0, "src": "192.168.50.10", "dst": "192.168.50.20", "protocol": "TCP", "dport": 8883, "initial_syn": false, "label": "normal"},
+    {"event_id": "U04", "elapsed_s": 5.0, "src": "192.168.50.10", "dst": "192.168.50.20", "protocol": "TCP", "dport": 23, "initial_syn": true, "label": "suspicious"},
+    {"event_id": "U05", "elapsed_s": 6.0, "src": "192.168.50.10", "dst": "192.168.50.20", "protocol": "TCP", "dport": 22, "initial_syn": true, "label": "suspicious"},
+    {"event_id": "U06", "elapsed_s": 7.0, "src": "192.168.50.10", "dst": "192.168.50.20", "protocol": "TCP", "dport": 23, "initial_syn": true, "label": "suspicious"}
+]

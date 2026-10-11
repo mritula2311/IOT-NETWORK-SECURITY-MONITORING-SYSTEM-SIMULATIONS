@@ -1,0 +1,121 @@
+{
+  "test_results": [
+    {
+      "test_id": "TC01",
+      "name": "Normal sensor traffic",
+      "condition": "Authorized source; normal rate (5 packets, threshold=10)",
+      "expected": "No suspicious-traffic alert",
+      "actual": "0 alerts fired",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC02",
+      "name": "Unknown source detection",
+      "condition": "Local source 192.168.50.99 absent from registry",
+      "expected": "Unknown-source alert with evidence",
+      "actual": "UNKNOWN_IP alert fired: True",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC03",
+      "name": "Burst detection with device threshold",
+      "condition": "11 packets from sensor (threshold=10) in window",
+      "expected": "Burst alert",
+      "actual": "TRAFFIC_BURST alert fired: True (11 packets, threshold=10)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC04",
+      "name": "Threshold boundary (exact T)",
+      "condition": "Exactly 10 packets from sensor (threshold=10)",
+      "expected": "No burst alert for strict greater-than rule",
+      "actual": "Burst alerts: 0 (exactly 10 packets, threshold=10)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC05",
+      "name": "Window expiry",
+      "condition": "Event at t=0 should expire at t=5 (exclusive left boundary)",
+      "expected": "Old record excluded from (t-W, t]",
+      "actual": "Events in window at t=5: 2 (expected 2: t=1, t=5)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC06",
+      "name": "Distinct ports detection",
+      "condition": "6 initial SYNs to 6 distinct ports on same destination",
+      "expected": "Port-pattern alert",
+      "actual": "PORT_SCAN_PATTERN alert: True (6 distinct ports)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC07",
+      "name": "Repeated port (no scan)",
+      "condition": "Repeated SYNs to one port only",
+      "expected": "No distinct-port alert",
+      "actual": "Scan alerts: 0 (all SYNs to same port 443)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC08",
+      "name": "Malformed data rejection",
+      "condition": "Invalid (NaN) timestamp",
+      "expected": "Structured rejection; process remains usable",
+      "actual": "ValueError raised for NaN timestamp: True",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC09",
+      "name": "Legitimate camera burst",
+      "condition": "35 packets from camera (baseline T=30, camera T=40)",
+      "expected": "Baseline false-alarms, Enhanced does not",
+      "actual": "Baseline burst alerts: 1 (false positive). Enhanced burst alerts: 0 (correct)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC10",
+      "name": "Low-rate suspicious activity",
+      "condition": "1 suspicious packet (below burst threshold)",
+      "expected": "Unknown-IP detected; burst not triggered (documented limitation)",
+      "actual": "UNKNOWN_IP detected: True. Burst missed (below threshold): True",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC11",
+      "name": "Cooldown suppression and re-alert",
+      "condition": "Trigger at t=0, suppress at t=1, re-trigger at t=10",
+      "expected": "Suppression during cooldown, re-alert after cooldown",
+      "actual": "UNKNOWN_IP alerts: 2 (expected 2: t=0, t=10)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC12",
+      "name": "Privacy inspection",
+      "condition": "Examine all alert log fields",
+      "expected": "No prohibited identifiers, payloads, or secrets",
+      "actual": "Prohibited fields in log: none",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC13",
+      "name": "Unauthorized service detection",
+      "condition": "TempSensor accesses unauthorized port 23 (Telnet)",
+      "expected": "UNAUTHORIZED_SERVICE alert generated with severity HIGH",
+      "actual": "UNAUTHORIZED_SERVICE alert fired: True (port 23 blocked for TempSensor)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC14",
+      "name": "Automated quarantine mitigation",
+      "condition": "Compromised device exceeds critical threshold",
+      "expected": "Device quarantined, iptables rule created, subsequent traffic blocked",
+      "actual": "Quarantined: True, Firewall rule generated: True, Blocked packets: 1",
+      "status": "PASS"
+    }
+  ],
+  "summary": {
+    "total": 14,
+    "passed": 14,
+    "failed": 0
+  }
+}

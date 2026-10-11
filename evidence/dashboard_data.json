@@ -1,0 +1,1525 @@
+{
+  "generated_at": "2026-10-11T14:23:03.858304+00:00",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "network": {
+    "subnet": "192.168.50.0/24",
+    "devices": [
+      {
+        "ip": "192.168.50.1",
+        "name": "Gateway-01",
+        "role": "gateway",
+        "threshold": 50,
+        "allowed_ports": [
+          53,
+          80,
+          443,
+          8883,
+          8000,
+          8080
+        ],
+        "description": "Main network gateway \u2014 higher threshold for routing traffic"
+      },
+      {
+        "ip": "192.168.50.10",
+        "name": "TempSensor-01",
+        "role": "sensor",
+        "threshold": 10,
+        "allowed_ports": [
+          1883,
+          8883
+        ],
+        "description": "Temperature sensor \u2014 sends readings over MQTT / MQTTS"
+      },
+      {
+        "ip": "192.168.50.11",
+        "name": "Camera-01",
+        "role": "camera",
+        "threshold": 40,
+        "allowed_ports": [
+          80,
+          443,
+          554,
+          8883,
+          8080
+        ],
+        "description": "Security camera \u2014 higher rate for video stream bursts and management"
+      },
+      {
+        "ip": "192.168.50.20",
+        "name": "AppServer-01",
+        "role": "server",
+        "threshold": 60,
+        "allowed_ports": [
+          80,
+          443,
+          1883,
+          8883,
+          8000,
+          8080
+        ],
+        "description": "IoT application server \u2014 receives from many devices"
+      }
+    ]
+  },
+  "baseline_results": {
+    "normal": {
+      "observed": 20,
+      "monitored": 20,
+      "alerts": {},
+      "alert_count": 0
+    },
+    "unknown": {
+      "observed": 2,
+      "monitored": 2,
+      "alerts": {
+        "UNKNOWN_IP": 1
+      },
+      "alert_count": 1
+    },
+    "burst": {
+      "observed": 40,
+      "monitored": 40,
+      "alerts": {
+        "TRAFFIC_BURST": 1
+      },
+      "alert_count": 1
+    },
+    "scan": {
+      "observed": 6,
+      "monitored": 6,
+      "alerts": {
+        "PORT_SCAN_PATTERN": 1
+      },
+      "alert_count": 1
+    },
+    "mixed": {
+      "observed": 68,
+      "monitored": 68,
+      "alerts": {
+        "UNKNOWN_IP": 1,
+        "TRAFFIC_BURST": 1,
+        "PORT_SCAN_PATTERN": 1
+      },
+      "alert_count": 3
+    }
+  },
+  "alerts": [
+    {
+      "scenario": "mixed_attack",
+      "time": 10.0,
+      "rule": "UNKNOWN_IP",
+      "severity": "HIGH",
+      "threat_score": 35,
+      "threat_tier": "ELEVATED",
+      "source": "192.168.50.99",
+      "destination": "192.168.50.20",
+      "dport": 8883,
+      "device_name": "UNREGISTERED",
+      "device_role": "unknown",
+      "threshold": 30,
+      "detail": "Local source is absent from device registry.",
+      "quarantined": false
+    },
+    {
+      "scenario": "mixed_attack",
+      "time": 25.5,
+      "rule": "TRAFFIC_BURST",
+      "severity": "MEDIUM",
+      "threat_score": 25,
+      "threat_tier": "ELEVATED",
+      "source": "192.168.50.10",
+      "destination": "192.168.50.20",
+      "dport": 8883,
+      "device_name": "TempSensor-01",
+      "device_role": "sensor",
+      "threshold": 10,
+      "detail": ">10 packets in 5s (device threshold=10).",
+      "quarantined": false
+    },
+    {
+      "scenario": "mixed_attack",
+      "time": 55.0,
+      "rule": "UNAUTHORIZED_SERVICE",
+      "severity": "HIGH",
+      "threat_score": 35,
+      "threat_tier": "ELEVATED",
+      "source": "192.168.50.11",
+      "destination": "192.168.50.20",
+      "dport": 2000,
+      "device_name": "Camera-01",
+      "device_role": "camera",
+      "threshold": 40,
+      "detail": "Traffic to destination port 2000 violates allowed service profile.",
+      "quarantined": false
+    },
+    {
+      "scenario": "mixed_attack",
+      "time": 55.5,
+      "rule": "PORT_SCAN_PATTERN",
+      "severity": "CRITICAL",
+      "threat_score": 85,
+      "threat_tier": "COMPROMISED",
+      "source": "192.168.50.11",
+      "destination": "192.168.50.20",
+      "dport": 2005,
+      "device_name": "Camera-01",
+      "device_role": "camera",
+      "threshold": 40,
+      "detail": "6 distinct TCP destination ports in 5s.",
+      "quarantined": true
+    },
+    {
+      "scenario": "unauthorized_service",
+      "time": 5.0,
+      "rule": "UNAUTHORIZED_SERVICE",
+      "severity": "HIGH",
+      "threat_score": 35,
+      "threat_tier": "ELEVATED",
+      "source": "192.168.50.10",
+      "destination": "192.168.50.20",
+      "dport": 23,
+      "device_name": "TempSensor-01",
+      "device_role": "sensor",
+      "threshold": 10,
+      "detail": "Traffic to destination port 23 violates allowed service profile.",
+      "quarantined": false
+    }
+  ],
+  "mitigations": [
+    {
+      "ip": "192.168.50.11",
+      "device_name": "Camera-01",
+      "timestamp": 55.5,
+      "threat_score": 85,
+      "trigger_rule": "PORT_SCAN_PATTERN",
+      "status": "QUARANTINED",
+      "firewall_rule": "iptables -I FORWARD -s 192.168.50.11 -j DROP",
+      "action": "AUTOMATED_ISOLATION"
+    }
+  ],
+  "quarantined_devices": [
+    {
+      "ip": "192.168.50.11",
+      "device_name": "Camera-01",
+      "timestamp": 55.5,
+      "threat_score": 85,
+      "trigger_rule": "PORT_SCAN_PATTERN",
+      "status": "QUARANTINED",
+      "firewall_rule": "iptables -I FORWARD -s 192.168.50.11 -j DROP",
+      "action": "AUTOMATED_ISOLATION"
+    }
+  ],
+  "test_results": [
+    {
+      "test_id": "TC01",
+      "name": "Normal sensor traffic",
+      "condition": "Authorized source; normal rate (5 packets, threshold=10)",
+      "expected": "No suspicious-traffic alert",
+      "actual": "0 alerts fired",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC02",
+      "name": "Unknown source detection",
+      "condition": "Local source 192.168.50.99 absent from registry",
+      "expected": "Unknown-source alert with evidence",
+      "actual": "UNKNOWN_IP alert fired: True",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC03",
+      "name": "Burst detection with device threshold",
+      "condition": "11 packets from sensor (threshold=10) in window",
+      "expected": "Burst alert",
+      "actual": "TRAFFIC_BURST alert fired: True (11 packets, threshold=10)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC04",
+      "name": "Threshold boundary (exact T)",
+      "condition": "Exactly 10 packets from sensor (threshold=10)",
+      "expected": "No burst alert for strict greater-than rule",
+      "actual": "Burst alerts: 0 (exactly 10 packets, threshold=10)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC05",
+      "name": "Window expiry",
+      "condition": "Event at t=0 should expire at t=5 (exclusive left boundary)",
+      "expected": "Old record excluded from (t-W, t]",
+      "actual": "Events in window at t=5: 2 (expected 2: t=1, t=5)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC06",
+      "name": "Distinct ports detection",
+      "condition": "6 initial SYNs to 6 distinct ports on same destination",
+      "expected": "Port-pattern alert",
+      "actual": "PORT_SCAN_PATTERN alert: True (6 distinct ports)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC07",
+      "name": "Repeated port (no scan)",
+      "condition": "Repeated SYNs to one port only",
+      "expected": "No distinct-port alert",
+      "actual": "Scan alerts: 0 (all SYNs to same port 443)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC08",
+      "name": "Malformed data rejection",
+      "condition": "Invalid (NaN) timestamp",
+      "expected": "Structured rejection; process remains usable",
+      "actual": "ValueError raised for NaN timestamp: True",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC09",
+      "name": "Legitimate camera burst",
+      "condition": "35 packets from camera (baseline T=30, camera T=40)",
+      "expected": "Baseline false-alarms, Enhanced does not",
+      "actual": "Baseline burst alerts: 1 (false positive). Enhanced burst alerts: 0 (correct)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC10",
+      "name": "Low-rate suspicious activity",
+      "condition": "1 suspicious packet (below burst threshold)",
+      "expected": "Unknown-IP detected; burst not triggered (documented limitation)",
+      "actual": "UNKNOWN_IP detected: True. Burst missed (below threshold): True",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC11",
+      "name": "Cooldown suppression and re-alert",
+      "condition": "Trigger at t=0, suppress at t=1, re-trigger at t=10",
+      "expected": "Suppression during cooldown, re-alert after cooldown",
+      "actual": "UNKNOWN_IP alerts: 2 (expected 2: t=0, t=10)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC12",
+      "name": "Privacy inspection",
+      "condition": "Examine all alert log fields",
+      "expected": "No prohibited identifiers, payloads, or secrets",
+      "actual": "Prohibited fields in log: none",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC13",
+      "name": "Unauthorized service detection",
+      "condition": "TempSensor accesses unauthorized port 23 (Telnet)",
+      "expected": "UNAUTHORIZED_SERVICE alert generated with severity HIGH",
+      "actual": "UNAUTHORIZED_SERVICE alert fired: True (port 23 blocked for TempSensor)",
+      "status": "PASS"
+    },
+    {
+      "test_id": "TC14",
+      "name": "Automated quarantine mitigation",
+      "condition": "Compromised device exceeds critical threshold",
+      "expected": "Device quarantined, iptables rule created, subsequent traffic blocked",
+      "actual": "Quarantined: True, Firewall rule generated: True, Blocked packets: 1",
+      "status": "PASS"
+    }
+  ],
+  "evaluation": [
+    {
+      "scenario": "camera_burst",
+      "total_events": 35,
+      "baseline_alerts": 1,
+      "enhanced_alerts": 0,
+      "baseline_metrics": {
+        "TP": 0,
+        "FP": 1,
+        "FN": 0,
+        "TN": 0,
+        "precision": 0.0,
+        "recall": "N/A",
+        "false_positive_rate": 1.0
+      },
+      "enhanced_metrics": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 0,
+        "TN": 1,
+        "precision": "N/A",
+        "recall": "N/A",
+        "false_positive_rate": 0.0
+      }
+    },
+    {
+      "scenario": "mixed_attack",
+      "total_events": 60,
+      "baseline_alerts": 3,
+      "enhanced_alerts": 4,
+      "baseline_metrics": {
+        "TP": 2,
+        "FP": 0,
+        "FN": 0,
+        "TN": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "false_positive_rate": 0.0
+      },
+      "enhanced_metrics": {
+        "TP": 2,
+        "FP": 1,
+        "FN": 0,
+        "TN": 0,
+        "precision": 0.6667,
+        "recall": 1.0,
+        "false_positive_rate": 1.0
+      }
+    },
+    {
+      "scenario": "normal",
+      "total_events": 8,
+      "baseline_alerts": 0,
+      "enhanced_alerts": 0,
+      "baseline_metrics": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 0,
+        "TN": 3,
+        "precision": "N/A",
+        "recall": "N/A",
+        "false_positive_rate": 0.0
+      },
+      "enhanced_metrics": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 0,
+        "TN": 3,
+        "precision": "N/A",
+        "recall": "N/A",
+        "false_positive_rate": 0.0
+      }
+    },
+    {
+      "scenario": "unauthorized_service",
+      "total_events": 6,
+      "baseline_alerts": 0,
+      "enhanced_alerts": 1,
+      "baseline_metrics": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1,
+        "TN": 0,
+        "precision": "N/A",
+        "recall": 0.0,
+        "false_positive_rate": "N/A"
+      },
+      "enhanced_metrics": {
+        "TP": 1,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "false_positive_rate": "N/A"
+      }
+    }
+  ],
+  "scenario_events": {
+    "camera_burst": [
+      {
+        "event_id": "CB001",
+        "elapsed_s": 0.0,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB002",
+        "elapsed_s": 0.03,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB003",
+        "elapsed_s": 0.06,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB004",
+        "elapsed_s": 0.09,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB005",
+        "elapsed_s": 0.12,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB006",
+        "elapsed_s": 0.15,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB007",
+        "elapsed_s": 0.18,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB008",
+        "elapsed_s": 0.21,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB009",
+        "elapsed_s": 0.24,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB010",
+        "elapsed_s": 0.27,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB011",
+        "elapsed_s": 0.3,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB012",
+        "elapsed_s": 0.33,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB013",
+        "elapsed_s": 0.36,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB014",
+        "elapsed_s": 0.39,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB015",
+        "elapsed_s": 0.42,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB016",
+        "elapsed_s": 0.45,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB017",
+        "elapsed_s": 0.48,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB018",
+        "elapsed_s": 0.51,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB019",
+        "elapsed_s": 0.54,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB020",
+        "elapsed_s": 0.57,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB021",
+        "elapsed_s": 0.6,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB022",
+        "elapsed_s": 0.63,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB023",
+        "elapsed_s": 0.66,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB024",
+        "elapsed_s": 0.69,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB025",
+        "elapsed_s": 0.72,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB026",
+        "elapsed_s": 0.75,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB027",
+        "elapsed_s": 0.78,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB028",
+        "elapsed_s": 0.81,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB029",
+        "elapsed_s": 0.84,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB030",
+        "elapsed_s": 0.87,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB031",
+        "elapsed_s": 0.9,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB032",
+        "elapsed_s": 0.93,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB033",
+        "elapsed_s": 0.96,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB034",
+        "elapsed_s": 0.99,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "CB035",
+        "elapsed_s": 1.02,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      }
+    ],
+    "mixed_attack": [
+      {
+        "event_id": "M001",
+        "elapsed_s": 0.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "M002",
+        "elapsed_s": 0.5,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "M003",
+        "elapsed_s": 1.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "M004",
+        "elapsed_s": 1.5,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "M005",
+        "elapsed_s": 2.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "U001",
+        "elapsed_s": 10.0,
+        "src": "192.168.50.99",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "U002",
+        "elapsed_s": 10.1,
+        "src": "192.168.50.99",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "B001",
+        "elapsed_s": 25.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B002",
+        "elapsed_s": 25.05,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B003",
+        "elapsed_s": 25.1,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B004",
+        "elapsed_s": 25.15,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B005",
+        "elapsed_s": 25.2,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B006",
+        "elapsed_s": 25.25,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B007",
+        "elapsed_s": 25.3,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B008",
+        "elapsed_s": 25.35,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B009",
+        "elapsed_s": 25.4,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B010",
+        "elapsed_s": 25.45,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B011",
+        "elapsed_s": 25.5,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "B012",
+        "elapsed_s": 25.55,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C001",
+        "elapsed_s": 40.0,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C002",
+        "elapsed_s": 40.02,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C003",
+        "elapsed_s": 40.04,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C004",
+        "elapsed_s": 40.06,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C005",
+        "elapsed_s": 40.08,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C006",
+        "elapsed_s": 40.1,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C007",
+        "elapsed_s": 40.12,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C008",
+        "elapsed_s": 40.14,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C009",
+        "elapsed_s": 40.16,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C010",
+        "elapsed_s": 40.18,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C011",
+        "elapsed_s": 40.2,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C012",
+        "elapsed_s": 40.22,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C013",
+        "elapsed_s": 40.24,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C014",
+        "elapsed_s": 40.26,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C015",
+        "elapsed_s": 40.28,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C016",
+        "elapsed_s": 40.3,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C017",
+        "elapsed_s": 40.32,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C018",
+        "elapsed_s": 40.34,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C019",
+        "elapsed_s": 40.36,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C020",
+        "elapsed_s": 40.38,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C021",
+        "elapsed_s": 40.4,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C022",
+        "elapsed_s": 40.42,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C023",
+        "elapsed_s": 40.44,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C024",
+        "elapsed_s": 40.46,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C025",
+        "elapsed_s": 40.48,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C026",
+        "elapsed_s": 40.5,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C027",
+        "elapsed_s": 40.52,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C028",
+        "elapsed_s": 40.54,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C029",
+        "elapsed_s": 40.56,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C030",
+        "elapsed_s": 40.58,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C031",
+        "elapsed_s": 40.6,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C032",
+        "elapsed_s": 40.62,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C033",
+        "elapsed_s": 40.64,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C034",
+        "elapsed_s": 40.66,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "C035",
+        "elapsed_s": 40.68,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "S001",
+        "elapsed_s": 55.0,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 2000,
+        "initial_syn": true,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "S002",
+        "elapsed_s": 55.1,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 2001,
+        "initial_syn": true,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "S003",
+        "elapsed_s": 55.2,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 2002,
+        "initial_syn": true,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "S004",
+        "elapsed_s": 55.3,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 2003,
+        "initial_syn": true,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "S005",
+        "elapsed_s": 55.4,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 2004,
+        "initial_syn": true,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "S006",
+        "elapsed_s": 55.5,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 2005,
+        "initial_syn": true,
+        "label": "suspicious"
+      }
+    ],
+    "normal": [
+      {
+        "event_id": "N001",
+        "elapsed_s": 0.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "N002",
+        "elapsed_s": 1.0,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "N003",
+        "elapsed_s": 2.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "N004",
+        "elapsed_s": 3.0,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "N005",
+        "elapsed_s": 4.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "N006",
+        "elapsed_s": 5.0,
+        "src": "192.168.50.1",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 443,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "N007",
+        "elapsed_s": 6.0,
+        "src": "192.168.50.11",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "N008",
+        "elapsed_s": 7.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      }
+    ],
+    "unauthorized_service": [
+      {
+        "event_id": "U01",
+        "elapsed_s": 0.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "U02",
+        "elapsed_s": 2.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "U03",
+        "elapsed_s": 4.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 8883,
+        "initial_syn": false,
+        "label": "normal"
+      },
+      {
+        "event_id": "U04",
+        "elapsed_s": 5.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 23,
+        "initial_syn": true,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "U05",
+        "elapsed_s": 6.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 22,
+        "initial_syn": true,
+        "label": "suspicious"
+      },
+      {
+        "event_id": "U06",
+        "elapsed_s": 7.0,
+        "src": "192.168.50.10",
+        "dst": "192.168.50.20",
+        "protocol": "TCP",
+        "dport": 23,
+        "initial_syn": true,
+        "label": "suspicious"
+      }
+    ]
+  }
+}

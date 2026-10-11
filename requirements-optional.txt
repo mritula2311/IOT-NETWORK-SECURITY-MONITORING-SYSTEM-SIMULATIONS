@@ -1,0 +1,3 @@
+# Needed only for passive live capture and the optional Scapy adapter test.
+# The simulation and core tests use the Python standard library only.
+scapy==2.8.0
